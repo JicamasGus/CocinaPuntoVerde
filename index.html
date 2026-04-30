@@ -5,192 +5,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pantalla - Cocina y Caja</title>
     <style>
-        /* =========================================
-           ESTILOS DE PANTALLA (NO SE IMPRIMEN) 
-           ========================================= */
+        /* ESTILOS DE PANTALLA */
         :root { --alerta: #ff9800; --fondo: #e0e0e0; --texto: #1a1a1a; --verde: #2e7d32; --rojo: #d32f2f; --azul: #1976d2; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
         body { background: var(--fondo); padding: 0; margin:0; }
         
-        /* PANTALLA LOGIN */
-        #pantalla-login { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-box { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .login-box h2 { color: #1a1a1a; margin-bottom: 20px; }
-        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; }
-        .login-box button { width: 100%; background: var(--verde); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
+        #pantalla-login { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #1a1a1a; display: flex; justify-content: center; align-items: center; z-index: 9999; flex-direction: column; }
+        .login-box { background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; text-align: center; }
+        .login-box input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; }
+        .login-box button { width: 100%; background: var(--verde); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        #error-sistema { display: none; background: var(--rojo); color: white; padding: 15px; border-radius: 8px; margin-top: 20px; width: 90%; max-width: 400px; text-align: center; font-weight: bold; }
 
         #pantalla-app { display: none; padding: 20px; }
-
-        .header { background: #1a1a1a; color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); flex-wrap: wrap; gap: 10px; }
-        .header h2 { font-size: 1.5rem; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .header { background: #1a1a1a; color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .reloj { font-size: 1.2rem; font-weight: bold; color: var(--alerta); }
-        
-        .btn-header { background: white; color: #1a1a1a; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .btn-header:hover { transform: scale(1.05); }
-        .btn-corte { background: var(--azul); color: white; }
-        .btn-logout { background: var(--rojo); color: white; }
+        .btn-header { background: white; color: #1a1a1a; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; }
 
         .grid-tickets { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .ticket { background: white; border-top: 8px solid var(--alerta); border-radius: 8px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-        .ticket-header { display: flex; justify-content: space-between; border-bottom: 2px dashed #ccc; padding-bottom: 10px; margin-bottom: 10px; align-items: center; }
-        .mesa { font-size: 1.5rem; font-weight: bold; color: var(--texto); }
-        .hora { background: #f0f0f0; padding: 4px 8px; border-radius: 6px; font-size: 0.9rem; font-weight: bold; }
-        
-        .lista-platillos { flex-grow: 1; list-style: none; margin-bottom: 15px; min-height: 80px; }
+        .ticket { background: white; border-top: 8px solid var(--alerta); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; }
+        .mesa { font-size: 1.5rem; font-weight: bold; }
+        .lista-platillos { flex-grow: 1; list-style: none; margin-bottom: 15px; }
         .lista-platillos li { font-size: 1.1rem; padding: 8px 0; border-bottom: 1px solid #f9f9f9; font-weight: 500; }
         
-        .btn-listo { background: var(--verde); color: white; border: none; padding: 12px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s; }
+        .btn-listo { background: var(--verde); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        
+        /* BOTÓN DE WHATSAPP NUEVO */
+        .btn-wa-confirmar { background: #25D366; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.2s; width: 100%; margin-bottom: 8px; }
+        .btn-wa-confirmar:hover { background: #1ebe56; }
+
         .estado-vacio { text-align: center; color: #666; font-size: 1.2rem; grid-column: 1 / -1; padding: 40px; background: white; border-radius: 8px; }
 
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--fondo); border-radius: 12px; width: 95%; max-width: 600px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .modal-header { background: #1a1a1a; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-cerrar { background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; }
+        .modal-content { background: var(--fondo); border-radius: 12px; width: 95%; max-width: 600px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
+        .modal-header { background: #1a1a1a; color: white; padding: 15px 20px; display: flex; justify-content: space-between; }
         .modal-body { padding: 20px; overflow-y: auto; }
-        
-        .tarjeta-cuenta { background: white; border-radius: 8px; padding: 15px; margin-bottom: 15px; border-left: 6px solid var(--verde); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .info-cuenta h3 { color: var(--texto); margin-bottom: 5px; font-size: 1.3rem; }
-        .total-cuenta { font-size: 1.5rem; color: var(--verde); font-weight: bold; }
-        .controles-pago { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .select-pago { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.95rem; background: #f9f9f9; }
-        .btn-cobrar { background: var(--verde); color: white; border: none; padding: 10px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .tarjeta-cuenta { background: white; border-radius: 8px; padding: 15px; margin-bottom: 15px; border-left: 6px solid var(--verde); display: flex; justify-content: space-between; align-items: center; }
+        .select-pago { padding: 8px; border-radius: 6px; border: 1px solid #ccc; }
 
-        /* =========================================
-           ZONA DE IMPRESIÓN (ESTILOS CORREGIDOS)
-           ========================================= */
+        /* IMPRESIÓN */
         #zona-impresion { display: none; }
-        
         @media print {
             body > *:not(#zona-impresion) { display: none !important; }
             body { background: white; padding: 0; margin: 0; }
+            #zona-impresion { display: block !important; width: 48mm; margin: 0; color: black; font-family: monospace; font-size: 10px; }
             
-            /* Contenedor principal del ticket (papel 58mm) */
-            #zona-impresion { 
-                display: block !important; 
-                width: 58mm; 
-                padding: 0 1mm; /* Pequeño margen interno */
-                margin: 0; 
-                color: black; 
-                font-family: monospace; /* Fuente de ticket clásica */
-                font-size: 11px; /* Fuente pequeña para que quepa todo */
-            }
-            
-            /* --- ENCABEZADO CORREGIDO --- */
-            .ticket-print-header { 
-                border-bottom: 1px dashed black; 
-                padding-bottom: 5px; 
-                margin-bottom: 5px; 
-            }
-
-            /* Contenedor Flex para alinear Logo y Título a los lados */
-            .header-main-row {
-                display: flex;
-                align-items: center; /* Centrado vertical entre logo y texto */
-                justify-content: start; /* Alineado a la izquierda */
-                gap: 5px; /* Espacio entre logo y texto */
-                margin-bottom: 5px;
-            }
-
-            /* NUEVOS ESTILOS DEL LOGO PEQUEÑO */
-            .ticket-logo {
-                height: 10mm; /* Tamaño fijo y pequeño (1 centímetro) */
-                width: auto; /* Mantiene la proporción */
-                display: block;
-                filter: grayscale(100%); /* Mejor contraste en térmicas */
-            }
-
-            .ticket-print-title { 
-                font-size: 14px; /* Un poco más grande que el resto */
-                font-weight: bold; 
-                text-align: left;
-            }
-            
-            /* Detalles debajo del título (centrados) */
-            .header-details {
-                text-align: center;
-                font-size: 10px;
-            }
-
-            /* --- CUERPO DEL TICKET --- */
-            .ticket-print-item { 
-                margin-bottom: 4px; 
-                line-height: 1.2; 
-                border-bottom: 1px solid #eee; 
-                text-align: left; 
-                padding-bottom: 2px;
-            }
-            
-            /* --- PIE DEL TICKET --- */
-            .ticket-print-footer { 
-                text-align: center; 
-                border-top: 1px dashed black; 
-                padding-top: 5px; 
-                margin-top: 8px; 
-                font-weight: bold; 
-                font-size: 12px;
-            }
+            .ticket-print-header { text-align: center; border-bottom: 1px dashed black; padding-bottom: 5px; margin-bottom: 5px; }
+            .logo-container { display: inline-block; vertical-align: middle; width: 30%; }
+            .title-container { display: inline-block; vertical-align: middle; width: 65%; text-align: left; }
+            .ticket-logo-img { width: 12mm; height: auto; display: block; filter: grayscale(100%); }
+            .ticket-print-title { font-size: 14px; font-weight: bold; }
+            .ticket-print-item { margin-bottom: 3px; border-bottom: 0.5px solid #eee; padding-bottom: 2px; }
+            .ticket-print-footer { text-align: center; border-top: 1px dashed black; padding-top: 5px; margin-top: 10px; font-weight: bold; }
         }
     </style>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
 
     <div id="pantalla-login">
         <div class="login-box">
-            <h2>🔥 Jícamas Gus<br><small style="font-size: 1rem; color:#666;">Acceso a Cocina / Caja</small></h2>
-            <input type="email" id="login-email" placeholder="Correo electrónico">
+            <h2>🔥 Jícamas Gus</h2>
+            <input type="email" id="login-email" placeholder="Correo">
             <input type="password" id="login-pass" placeholder="Contraseña">
-            <button id="btn-login" onclick="iniciarSesion()">Ingresar</button>
-            <p id="login-error" style="color:red; display:none; margin-top:10px; font-size:0.9rem;"></p>
+            <button onclick="iniciarSesion()">Ingresar</button>
+            <p id="login-error" style="color:red; display:none; margin-top:10px;"></p>
         </div>
+        <div id="error-sistema"></div>
     </div>
 
     <div id="pantalla-app">
         <div class="header">
-            <h2>
-                🔥 COCINA
+            <h2>🔥 COCINA 
                 <button class="btn-header" onclick="abrirModalCuentas()">💰 Cuentas</button>
-                <button class="btn-header btn-corte" onclick="abrirModalCorte()">📊 Corte Diario</button>
-                <button class="btn-header btn-logout" onclick="cerrarSesion()">Salir</button>
+                <button class="btn-header" onclick="abrirModalCorte()" style="background:var(--azul); color:white;">📊 Corte</button>
+                <button class="btn-header" onclick="cerrarSesion()" style="background:var(--rojo); color:white;">Salir</button>
             </h2>
             <div class="reloj" id="reloj">00:00</div>
         </div>
-
-        <div class="grid-tickets" id="contenedor-tickets">
-            <div class="estado-vacio">Conectando con el servidor... ⏳</div>
-        </div>
+        <div class="grid-tickets" id="contenedor-tickets"></div>
     </div>
 
     <div class="modal-overlay" id="modal-cuentas">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>Cuentas Activas</h2>
-                <button class="btn-cerrar" onclick="cerrarModal('modal-cuentas')">✖</button>
-            </div>
+            <div class="modal-header"><h2>Cuentas Activas</h2><button style="color:white; background:none; border:none; font-size:1.5rem;" onclick="cerrarModal('modal-cuentas')">✖</button></div>
             <div class="modal-body" id="contenedor-cuentas"></div>
         </div>
     </div>
 
     <div class="modal-overlay" id="modal-corte">
         <div class="modal-content">
-            <div class="modal-header" style="background: var(--azul);">
-                <h2>Corte de Caja Diario</h2>
-                <button class="btn-cerrar" onclick="cerrarModal('modal-corte')">✖</button>
-            </div>
-            <div class="modal-body">
-                <h3 style="text-align:center; margin-bottom:15px; color:#666;" id="fecha-corte">Calculando...</h3>
-                <div id="datos-corte"></div>
-            </div>
+            <div class="modal-header" style="background:var(--azul);"><h2>Corte Diario</h2><button style="color:white; background:none; border:none; font-size:1.5rem;" onclick="cerrarModal('modal-corte')">✖</button></div>
+            <div class="modal-body" id="datos-corte"></div>
         </div>
     </div>
 
     <div id="zona-impresion"></div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+
     <script>
-        // --- 1. DATOS DE FIREBASE ---
-        const firebaseConfig = {
+        // CAPTURADOR DE ERRORES GLOBALES
+        window.onerror = function(message) {
+            const errBox = document.getElementById('error-sistema');
+            errBox.style.display = 'block';
+            errBox.innerHTML = `⚠️ Error detectado:<br><small>${message}</small>`;
+        };
+
+        let auth, db;
+
+        try {
+            // --- 1. FIREBASE CONFIG ---
+         const firebaseConfig = {
   apiKey: "AIzaSyAECacQfYMN5yds-bXYDbw1RGEhfJ3K7Bs",
   authDomain: "jicamasguspunto.firebaseapp.com",
   projectId: "jicamasguspunto",
@@ -198,32 +125,32 @@
   messagingSenderId: "737468341092",
   appId: "1:737468341092:web:ef25693f5d8c65dfbbb871"
 };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
 
-        // --- SISTEMA DE LOGIN ---
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('pantalla-login').style.display = 'none';
-                document.getElementById('pantalla-app').style.display = 'block';
-                iniciarSistemaCocina(); // Solo arranca si hay login
-            } else {
-                document.getElementById('pantalla-login').style.display = 'flex';
-                document.getElementById('pantalla-app').style.display = 'none';
-            }
-        });
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    document.getElementById('pantalla-login').style.display = 'none';
+                    document.getElementById('pantalla-app').style.display = 'block';
+                    iniciarSistemaCocina();
+                } else {
+                    document.getElementById('pantalla-login').style.display = 'flex';
+                    document.getElementById('pantalla-app').style.display = 'none';
+                }
+            });
+        } catch (e) {
+            document.getElementById('error-sistema').style.display = 'block';
+            document.getElementById('error-sistema').innerText = "Error en credenciales de Firebase";
+        }
 
         function iniciarSesion() {
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-pass').value;
-            const btn = document.getElementById('btn-login');
-            const err = document.getElementById('login-error');
-            
-            btn.innerText = "Verificando...";
-            auth.signInWithEmailAndPassword(email, pass)
-                .then(() => { btn.innerText = "Ingresar"; err.style.display = "none"; })
-                .catch(error => { btn.innerText = "Ingresar"; err.innerText = "Credenciales incorrectas."; err.style.display = "block"; });
+            auth.signInWithEmailAndPassword(email, pass).catch(() => {
+                document.getElementById('login-error').style.display = 'block';
+                document.getElementById('login-error').innerText = "Acceso denegado";
+            });
         }
 
         function cerrarSesion() { auth.signOut(); }
@@ -234,170 +161,157 @@
 
         let esCargaInicial = true;
         let comandasProcesadas = new Set();
-        let cuentasPorMesaGlobal = {}; 
+        let cuentasPorMesaGlobal = {};
 
-        // --- SISTEMA DE COCINA Y CAJA ---
         function iniciarSistemaCocina() {
             db.collection("comandas").where("estado", "in", ["pendiente", "completado"]).onSnapshot((snapshot) => {
-                let pendientesParaCocina = [];
-                let resumenCuentas = {};
+                let pendientes = [];
+                let resumen = {};
 
                 snapshot.forEach(doc => {
                     const orden = doc.data();
-                    const id = doc.id;
-
-                    if(!resumenCuentas[orden.mesa]) {
-                        resumenCuentas[orden.mesa] = { total: 0, idsComandas: [], listaItems: [] };
-                    }
-                    resumenCuentas[orden.mesa].total += (orden.total || 0);
-                    resumenCuentas[orden.mesa].idsComandas.push(id);
-                    resumenCuentas[orden.mesa].listaItems.push(...orden.items);
-
-                    if(orden.estado === "pendiente") pendientesParaCocina.push({ id: id, ...orden });
+                    if(!resumen[orden.mesa]) resumen[orden.mesa] = { total: 0, ids: [], items: [] };
+                    resumen[orden.mesa].total += (orden.total || 0);
+                    resumen[orden.mesa].ids.push(doc.id);
+                    resumen[orden.mesa].items.push(...orden.items);
+                    if(orden.estado === "pendiente") pendientes.push({ id: doc.id, ...orden });
                 });
 
-                cuentasPorMesaGlobal = resumenCuentas;
+                cuentasPorMesaGlobal = resumen;
                 if(document.getElementById('modal-cuentas').style.display === 'flex') renderizarModalCuentas();
 
-                snapshot.docChanges().forEach((change) => {
+                snapshot.docChanges().forEach(change => {
                     if (change.type === "added" && change.doc.data().estado === "pendiente") {
-                        const id = change.doc.id;
-                        if (!esCargaInicial && !comandasProcesadas.has(id)) imprimirTicketCocina(change.doc.data());
-                        comandasProcesadas.add(id);
+                        if (!esCargaInicial && !comandasProcesadas.has(change.doc.id)) {
+                            imprimirTicketCocina(change.doc.data());
+                        }
+                        comandasProcesadas.add(change.doc.id);
                     }
                 });
                 esCargaInicial = false;
 
-                const contenedorCocina = document.getElementById('contenedor-tickets');
-                contenedorCocina.innerHTML = '';
-                if (pendientesParaCocina.length === 0) {
-                    contenedorCocina.innerHTML = '<div class="estado-vacio">No hay pedidos pendientes. ✨</div>';
-                } else {
-                    pendientesParaCocina.sort((a, b) => a.timestamp - b.timestamp);
-                    pendientesParaCocina.forEach(orden => {
-                        const itemsHTML = orden.items.map(i => `<li>👉 ${i}</li>`).join('');
-                        const div = document.createElement('div');
-                        div.className = 'ticket';
-                        div.innerHTML = `<div class="ticket-header"><span class="mesa">${orden.mesa}</span><span class="hora">🕒 ${orden.hora}</span></div><ul class="lista-platillos">${itemsHTML}</ul><button class="btn-listo" onclick="marcarComoListo('${orden.id}', this)">✔️ Marcar Listo</button>`;
-                        contenedorCocina.appendChild(div);
-                    });
+                const cont = document.getElementById('contenedor-tickets');
+                cont.innerHTML = '';
+                
+                if (pendientes.length === 0) {
+                    cont.innerHTML = '<div class="estado-vacio">No hay pedidos pendientes. ✨</div>';
+                    return;
                 }
+                
+                pendientes.sort((a,b) => a.timestamp - b.timestamp).forEach(orden => {
+                    const itemsHTML = orden.items.map(i => `<li>👉 ${i}</li>`).join('');
+                    
+                    // --- BOTÓN DE WHATSAPP ---
+                    let botonWhatsApp = '';
+                    if (orden.clienteTelefono) {
+                        let telLimpio = orden.clienteTelefono.replace(/\D/g, '');
+                        if (telLimpio.length === 10) telLimpio = '52' + telLimpio;
+                        
+                        let tipoTexto = orden.tipoEntrega === 'domicilio' ? 'para enviar a tu domicilio' : 'para que pases a recogerla';
+                        let mensajeWA = encodeURIComponent(`Hola ${orden.clienteNombre}, recibimos tu orden en *Jícamas Gus* por un total de $${(orden.total || 0).toFixed(2)}. ¡Ya la estamos preparando ${tipoTexto}! 👨‍🍳✨`);
+                        
+                        botonWhatsApp = `<button class="btn-wa-confirmar" onclick="window.open('https://wa.me/${telLimpio}?text=${mensajeWA}', '_blank')">📲 Confirmar por WA</button>`;
+                    }
+
+                    const div = document.createElement('div');
+                    div.className = 'ticket';
+                    div.innerHTML = `
+                        <div class="ticket-header">
+                            <span class="mesa" style="font-size: 1.1rem;">${orden.mesa}</span>
+                            <span class="hora">🕒 ${orden.hora}</span>
+                        </div>
+                        <ul class="lista-platillos">${itemsHTML}</ul>
+                        ${botonWhatsApp}
+                        <button class="btn-listo" onclick="marcarListo('${orden.id}')">✔️ Marcar Listo</button>
+                    `;
+                    cont.appendChild(div);
+                });
             });
         }
 
-        // FUNCIONES DE IMPRESIÓN
-        
-        // Ticket para cocina (se mantiene igual, sin logo para ahorrar papel)
+        async function marcarListo(id) { await db.collection("comandas").doc(id).update({ estado: "completado" }); }
+
         function imprimirTicketCocina(orden) {
             const zona = document.getElementById('zona-impresion');
-            let itemsParaImprimir = orden.items.map(i => `<div class="ticket-print-item">- ${i.replace(/<\/?[^>]+(>|$)/g, " ")}</div>`).join('');
-            zona.innerHTML = `<div class="ticket-print-header" style="text-align:center;"><div class="ticket-print-title">JíCAMAS GUS</div><div>ORDEN: <b>${orden.mesa}</b></div><div>Hora: ${orden.hora}</div></div><div style="margin:10px 0;">${itemsParaImprimir}</div><div class="ticket-print-footer">--- COCINA ---</div>`;
+            zona.innerHTML = `<div class="ticket-print-header"><b>ORDEN: ${orden.mesa}</b><br>${orden.hora}</div><div>${orden.items.map(i => `<div class="ticket-print-item">- ${i.replace(/<\/?[^>]+(>|$)/g, " ")}</div>`).join('')}</div>`;
             window.print();
         }
 
-        // --- FUNCIÓN DEL TICKET DE VENTA (CORREGIDA CON NUEVO DISEÑO) ---
         function imprimirTicketVenta(mesa, items, total, formaPago) {
             const zona = document.getElementById('zona-impresion');
-            
-            // Limpiamos los tags HTML de los items para el ticket de texto
-            let itemsParaImprimir = items.map(i => `<div class="ticket-print-item">${i.replace(/<\/?[^>]+(>|$)/g, " ")}</div>`).join('');
+            let itemsHtml = items.map(i => `<div class="ticket-print-item">${i.replace(/<\/?[^>]+(>|$)/g, " ")}</div>`).join('');
             
             zona.innerHTML = `
                 <div class="ticket-print-header">
-                    
-                    
-                    <div class="header-details">
-                        <div>JICAMAS GUS PUNTO VERDE</div>
-                        <div>*** COMPROBANTE DE PAGO ***</div>
-                        <div>Mesa: <b>${mesa}</b></div>
-                        <div>Fecha: ${new Date().toLocaleDateString()}</div>
+                    <div class="logo-container">
+                        <img id="img-logo-ticket" src="img/gus.png" class="ticket-logo-img">
+                    </div>
+                    <div class="title-container">
+                        <div class="ticket-print-title">JíCAMAS GUS</div>
+                        <div style="font-size:9px;">Mesa: ${mesa}</div>
+                        <div style="font-size:9px;">${new Date().toLocaleDateString()}</div>
                     </div>
                 </div>
-                
-                <div style="margin:8px 0;">
-                    ${itemsParaImprimir}
-                </div>
-                
+                <div style="margin:5px 0;">${itemsHtml}</div>
                 <div class="ticket-print-footer">
-                    TOTAL A PAGAR: $${total.toFixed(2)}<br>
-                    Pago: ${formaPago}<br><br>
-                    ¡GRACIAS POR SU VISITA!
+                    TOTAL: $${total.toFixed(2)}<br>
+                    Pago: ${formaPago}
                 </div>`;
-            window.print();
+
+            const logo = document.getElementById('img-logo-ticket');
+            const ejecutarImpresion = () => { window.print(); };
+
+            if (logo.complete) {
+                ejecutarImpresion();
+            } else {
+                logo.onload = ejecutarImpresion;
+                logo.onerror = () => { logo.style.display = 'none'; ejecutarImpresion(); };
+            }
         }
 
-        window.marcarComoListo = async function(id, btn) {
-            btn.innerText = "⏳..."; btn.disabled = true;
-            try { await db.collection("comandas").doc(id).update({ estado: "completado" }); } 
-            catch (e) { btn.disabled = false; }
-        };
-
+        function abrirModalCuentas() { renderizarModalCuentas(); document.getElementById('modal-cuentas').style.display = 'flex'; }
         function cerrarModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // CAJA Y COBROS
-        window.abrirModalCuentas = function() {
-            renderizarModalCuentas();
-            document.getElementById('modal-cuentas').style.display = 'flex';
-        };
-
         function renderizarModalCuentas() {
-            const contenedor = document.getElementById('contenedor-cuentas');
-            contenedor.innerHTML = '';
+            const cont = document.getElementById('contenedor-cuentas');
+            cont.innerHTML = '';
+            
             const mesas = Object.keys(cuentasPorMesaGlobal).sort((a,b) => a.localeCompare(b, undefined, {numeric:true}));
             if(mesas.length === 0) {
-                contenedor.innerHTML = '<p style="text-align:center; color:#666; margin-top:20px;">No hay cuentas activas.</p>';
+                cont.innerHTML = '<p style="text-align:center; color:#666; margin-top:20px;">No hay cuentas activas.</p>';
                 return;
             }
+
             mesas.forEach(mesa => {
-                const cuenta = cuentasPorMesaGlobal[mesa];
+                const c = cuentasPorMesaGlobal[mesa];
                 const idSel = "pago-" + mesa.replace(/\s+/g, '');
-                contenedor.innerHTML += `<div class="tarjeta-cuenta"><div class="info-cuenta"><h3>${mesa}</h3><div class="total-cuenta">$${cuenta.total.toFixed(2)}</div></div><div class="controles-pago"><select id="${idSel}" class="select-pago"><option value="Efectivo">Efectivo</option><option value="Tarjeta">Tarjeta</option><option value="Transferencia">Transferencia</option></select><button class="btn-cobrar" onclick="cobrarMesa('${mesa}', '${idSel}')">Cobrar e Imprimir</button></div></div>`;
+                cont.innerHTML += `<div class="tarjeta-cuenta"><div><b>${mesa}</b><br>$${c.total.toFixed(2)}</div><div><select id="${idSel}" class="select-pago"><option>Efectivo</option><option>Tarjeta</option><option>Transferencia</option></select><button class="btn-listo" style="margin-left:5px; width:auto;" onclick="cobrarMesa('${mesa}', '${idSel}')">Cobrar e Imprimir</button></div></div>`;
             });
         }
 
-        window.cobrarMesa = async function(mesa, idSel) {
-            const formaPago = document.getElementById(idSel).value;
-            const cuenta = cuentasPorMesaGlobal[mesa];
-            if(!confirm(`¿Cobrar $${cuenta.total.toFixed(2)} de la ${mesa}?`)) return;
+        async function cobrarMesa(mesa, idSel) {
+            const pago = document.getElementById(idSel).value;
+            const c = cuentasPorMesaGlobal[mesa];
+            if(!confirm("¿Cobrar e imprimir ticket?")) return;
             
-            // Importante: Imprimir ANTES de actualizar la base de datos para asegurar tener los datos
-            imprimirTicketVenta(mesa, cuenta.listaItems, cuenta.total, formaPago);
-
-            try {
-                const batch = db.batch();
-                const fecha = new Date().toLocaleDateString('es-MX');
-                cuenta.idsComandas.forEach(id => {
-                    batch.update(db.collection("comandas").doc(id), { estado: "pagado", formaPago: formaPago, fechaPago: fecha });
-                });
-                await batch.commit();
-                alert(`✅ ${mesa} cobrada exitosamente.`);
-            } catch (e) { alert("Error al cobrar."); }
-        };
-
-        // CORTE DIARIO
-        window.abrirModalCorte = async function() {
-            document.getElementById('modal-corte').style.display = 'flex';
-            const contenedor = document.getElementById('datos-corte');
+            imprimirTicketVenta(mesa, c.items, c.total, pago);
+            
+            const batch = db.batch();
             const fecha = new Date().toLocaleDateString('es-MX');
-            document.getElementById('fecha-corte').innerText = `Día: ${fecha}`;
-            contenedor.innerHTML = 'Cargando...';
+            c.ids.forEach(id => batch.update(db.collection("comandas").doc(id), { estado: "pagado", formaPago: pago, fechaPago: fecha }));
+            await batch.commit();
+        }
 
-            try {
-                const snap = await db.collection("comandas").where("fechaPago", "==", fecha).get();
-                let tot = {"Efectivo": 0, "Tarjeta": 0, "Transferencia": 0}, gTot = 0;
-                snap.forEach(doc => {
-                    const d = doc.data();
-                    if(d.estado === "pagado") { tot[d.formaPago] += (d.total || 0); gTot += (d.total || 0); }
-                });
-                contenedor.innerHTML = `<div style="background:white; padding:15px; border-radius:8px;">
-                    <p>💵 Efectivo: <b>$${tot.Efectivo.toFixed(2)}</b></p>
-                    <p>💳 Tarjeta: <b>$${tot.Tarjeta.toFixed(2)}</b></p>
-                    <p>📱 Transf: <b>$${tot.Transferencia.toFixed(2)}</b></p>
-                    <hr style="margin:10px 0;">
-                    <h3 style="color:var(--verde)">TOTAL: $${gTot.toFixed(2)}</h3>
-                </div>`;
-            } catch (e) { contenedor.innerHTML = 'Error.'; }
-        };
+        async function abrirModalCorte() {
+            document.getElementById('modal-corte').style.display = 'flex';
+            const cont = document.getElementById('datos-corte');
+            const fecha = new Date().toLocaleDateString('es-MX');
+            cont.innerHTML = "Cargando...";
+            const snap = await db.collection("comandas").where("fechaPago", "==", fecha).get();
+            let t = {Efectivo:0, Tarjeta:0, Transferencia:0}, g = 0;
+            snap.forEach(d => { const dat = d.data(); if(dat.estado==="pagado"){ t[dat.formaPago]+=(dat.total||0); g+=(dat.total||0); } });
+            cont.innerHTML = `<p>💵 Efectivo: $${t.Efectivo.toFixed(2)}</p><p>💳 Tarjeta: $${t.Tarjeta.toFixed(2)}</p><p>📱 Transf: $${t.Transferencia.toFixed(2)}</p><hr><h3>TOTAL: $${g.toFixed(2)}</h3>`;
+        }
     </script>
 </body>
 </html>
