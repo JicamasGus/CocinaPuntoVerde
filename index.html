@@ -20,7 +20,10 @@
         #pantalla-app { display: none; padding: 20px; }
         .header { background: #1a1a1a; color: white; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         .reloj { font-size: 1.2rem; font-weight: bold; color: var(--alerta); }
-        .btn-header { background: white; color: #1a1a1a; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-header { background: white; color: #1a1a1a; border: none; padding: 8px 15px; border-radius: 6px; font-weight: bold; cursor: pointer; margin-left: 5px; }
+        .btn-comandera-abierta { background: var(--verde) !important; color: white !important; }
+        .btn-comandera-cerrada { background: var(--rojo) !important; color: white !important; }
+        .estado-comandera { font-size: 0.85rem; margin-left: 8px; font-weight: bold; opacity: 0.9; }
 
         .grid-tickets { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .ticket { background: white; border-top: 8px solid var(--alerta); border-radius: 8px; padding: 15px; display: flex; flex-direction: column; }
@@ -76,6 +79,8 @@
     <div id="pantalla-app">
         <div class="header">
             <h2>🔥 COCINA 
+                <button class="btn-header" id="btn-permiso-comandera" onclick="alternarPermisoComandera()">🔒 Comandera cerrada</button>
+                <span class="estado-comandera" id="texto-estado-comandera">Esperando estado...</span>
                 <button class="btn-header" onclick="abrirModalCuentas()">💰 Cuentas</button>
                 <button class="btn-header" onclick="abrirModalCorte()" style="background:var(--azul); color:white;">📊 Corte</button>
                 <button class="btn-header" onclick="cerrarSesion()" style="background:var(--rojo); color:white;">Salir</button>
@@ -162,8 +167,86 @@
         let esCargaInicial = true;
         let comandasProcesadas = new Set();
         let cuentasPorMesaGlobal = {};
+        let sistemaCocinaIniciado = false;
+        let permisoComanderaAbierta = false;
+        let escuchaPermisoActiva = false;
+
+        
+        function normalizarMesaId(mesa) {
+            return mesa.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_\-]/g, '');
+        }
+
+        function escucharPermisoComandera() {
+            if (escuchaPermisoActiva) return;
+            escuchaPermisoActiva = true;
+
+            db.collection("configuracion").doc("comandera").onSnapshot((doc) => {
+                if (!doc.exists) {
+                    db.collection("configuracion").doc("comandera").set({ abierta: false, actualizado: Date.now() }, { merge: true });
+                    return;
+                }
+
+                const data = doc.data() || {};
+                permisoComanderaAbierta = data.abierta === true;
+                actualizarBotonPermisoComandera();
+            }, (error) => {
+                console.error("Error leyendo permiso de comandera:", error);
+                const texto = document.getElementById('texto-estado-comandera');
+                if (texto) texto.innerText = "Sin acceso al permiso";
+            });
+        }
+
+        function actualizarBotonPermisoComandera() {
+            const btn = document.getElementById('btn-permiso-comandera');
+            const texto = document.getElementById('texto-estado-comandera');
+            if (!btn || !texto) return;
+
+            btn.classList.remove('btn-comandera-abierta', 'btn-comandera-cerrada');
+            if (permisoComanderaAbierta) {
+                btn.innerText = "🟢 Cerrar comandera";
+                btn.classList.add('btn-comandera-abierta');
+                texto.innerText = "Comandera abierta";
+            } else {
+                btn.innerText = "🔴 Abrir comandera";
+                btn.classList.add('btn-comandera-cerrada');
+                texto.innerText = "Comandera cerrada";
+            }
+        }
+
+        async function alternarPermisoComandera() {
+            const nuevoEstado = !permisoComanderaAbierta;
+            const mensaje = nuevoEstado
+                ? "¿Abrir la comandera para que los meseros puedan tomar pedidos?"
+                : "¿Cerrar la comandera para bloquear nuevos pedidos?";
+
+            if (!confirm(mensaje)) return;
+
+            try {
+                await db.collection("configuracion").doc("comandera").set({
+                    abierta: nuevoEstado,
+                    actualizado: Date.now()
+                }, { merge: true });
+            } catch (error) {
+                console.error("Error cambiando permiso de comandera:", error);
+                alert("No se pudo cambiar el permiso de la comandera.");
+            }
+        }
+
+        async function avisarMesaCobrada(mesa) {
+            const mesaId = normalizarMesaId(mesa);
+            await db.collection("mesas").doc(mesaId).set({
+                mesa: mesa,
+                estado: "cobrada",
+                limpiar: true,
+                actualizado: Date.now()
+            }, { merge: true });
+        }
 
         function iniciarSistemaCocina() {
+            if (sistemaCocinaIniciado) return;
+            sistemaCocinaIniciado = true;
+            escucharPermisoComandera();
+
             db.collection("comandas").where("estado", "in", ["pendiente", "completado"]).onSnapshot((snapshot) => {
                 let pendientes = [];
                 let resumen = {};
@@ -300,6 +383,11 @@
             const fecha = new Date().toLocaleDateString('es-MX');
             c.ids.forEach(id => batch.update(db.collection("comandas").doc(id), { estado: "pagado", formaPago: pago, fechaPago: fecha }));
             await batch.commit();
+
+            // Aviso para que la comandera limpie esta mesa automáticamente al detectar que fue cobrada.
+            await avisarMesaCobrada(mesa);
+            alert(`${mesa} cobrada. La mesa quedó marcada para limpiarse en comandera.`);
+            cerrarModal('modal-cuentas');
         }
 
         async function abrirModalCorte() {
