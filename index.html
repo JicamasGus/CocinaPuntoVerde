@@ -242,6 +242,12 @@
             }, { merge: true });
         }
 
+        function quitarHtml(html) {
+            const temp = document.createElement('div');
+            temp.innerHTML = html || '';
+            return temp.textContent || temp.innerText || '';
+        }
+
         function iniciarSistemaCocina() {
             if (sistemaCocinaIniciado) return;
             sistemaCocinaIniciado = true;
@@ -253,10 +259,21 @@
 
                 snapshot.forEach(doc => {
                     const orden = doc.data();
-                    if(!resumen[orden.mesa]) resumen[orden.mesa] = { total: 0, ids: [], items: [] };
+                    if(!resumen[orden.mesa]) resumen[orden.mesa] = { total: 0, ids: [], items: [], itemsDetalle: [] };
                     resumen[orden.mesa].total += (orden.total || 0);
                     resumen[orden.mesa].ids.push(doc.id);
-                    resumen[orden.mesa].items.push(...orden.items);
+                    resumen[orden.mesa].items.push(...(orden.items || []));
+
+                    if (Array.isArray(orden.itemsDetalle) && orden.itemsDetalle.length > 0) {
+                        resumen[orden.mesa].itemsDetalle.push(...orden.itemsDetalle);
+                    } else if (Array.isArray(orden.items)) {
+                        // Compatibilidad con comandas anteriores que no tenían precio por producto.
+                        const precioPromedio = orden.items.length ? (orden.total || 0) / orden.items.length : 0;
+                        orden.items.forEach(item => {
+                            resumen[orden.mesa].itemsDetalle.push({ texto: item, textoPlano: quitarHtml(item), precio: precioPromedio });
+                        });
+                    }
+
                     if(orden.estado === "pendiente") pendientes.push({ id: doc.id, ...orden });
                 });
 
@@ -316,13 +333,22 @@
 
         function imprimirTicketCocina(orden) {
             const zona = document.getElementById('zona-impresion');
-            zona.innerHTML = `<div class="ticket-print-header"><b>ORDEN: ${orden.mesa}</b><br>${orden.hora}</div><div>${orden.items.map(i => `<div class="ticket-print-item">- ${i.replace(/<\/?[^>]+(>|$)/g, " ")}</div>`).join('')}</div>`;
+            zona.innerHTML = `<div class="ticket-print-header"><b>ORDEN: ${orden.mesa}</b><br>${orden.hora}</div><div>${(orden.items || []).map(i => `<div class="ticket-print-item">- ${quitarHtml(i)}</div>`).join('')}</div>`;
             window.print();
         }
 
-        function imprimirTicketVenta(mesa, items, total, formaPago) {
+        function imprimirTicketVenta(mesa, itemsDetalle, total, formaPago) {
             const zona = document.getElementById('zona-impresion');
-            let itemsHtml = items.map(i => `<div class="ticket-print-item">${i.replace(/<\/?[^>]+(>|$)/g, " ")}</div>`).join('');
+
+            let itemsHtml = (itemsDetalle || []).map(item => {
+                const texto = quitarHtml(item.texto || item.textoPlano || item || '');
+                const precio = parseFloat(item.precio) || 0;
+                return `
+                    <div class="ticket-print-item" style="display:flex; justify-content:space-between; gap:4px;">
+                        <span style="width:70%;">${texto}</span>
+                        <span style="width:30%; text-align:right;">$${precio.toFixed(2)}</span>
+                    </div>`;
+            }).join('');
             
             zona.innerHTML = `
                 <div class="ticket-print-header">
@@ -377,7 +403,7 @@
             const c = cuentasPorMesaGlobal[mesa];
             if(!confirm("¿Cobrar e imprimir ticket?")) return;
             
-            imprimirTicketVenta(mesa, c.items, c.total, pago);
+            imprimirTicketVenta(mesa, c.itemsDetalle, c.total, pago);
             
             const batch = db.batch();
             const fecha = new Date().toLocaleDateString('es-MX');
